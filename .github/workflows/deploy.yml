@@ -23,25 +23,10 @@ jobs:
           port: 22
           script: |
             whoami
-
-            # Clone repo if directory doesn't exist
-            if [ ! -d "EC2-CICD-Nextjs" ]; then
-              git clone https://github.com/Ashish7103/EC2-CICD-Nextjs.git
-            fi
-
             cd EC2-CICD-Nextjs
             git pull origin main
 
-            # Ensure npm is installed if missing
-            if ! command -v npm &> /dev/null; then
-              echo "npm not found, installing..."
-              sudo apt update
-              sudo apt install -y npm
-            fi
-
-            # Print versions
-            node -v
-            npm -v
+           
 
             # Install and build
             npm install
