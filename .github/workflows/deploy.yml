@@ -1,4 +1,4 @@
-name: Push-to-EC2 instance
+name: Deploy Next.js to EC2
 
 on:
   push:
@@ -7,48 +7,48 @@ on:
 
 jobs:
   deploy:
-    name: Push to EC2
+    name: Deploy to EC2
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout the code
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Deploy to my EC2 instance
+      - name: Deploy project files to EC2
         uses: easingthemes/ssh-deploy@v2.1.5
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-          SOURCE: "./"
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
           REMOTE_USER: ${{ secrets.USERNAME }}
+          SOURCE: "./"
           TARGET: ${{ secrets.TARGET_DIR }}
 
-      - name: Executing remote ssh commands using ssh key
+      - name: Run build & start commands on EC2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo yum -y update
-            sudo yum install -y httpd
-            sudo systemctl start httpd
-            sudo systemctl enable httpd
-            # Add Node.js source for latest version
-            curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
-            # Install Node.js and npm
-            sudo yum install -y nodejs
-            # Navigate to the project directory
+            # Navigate to project
             cd ${{ secrets.TARGET_DIR }}
-            # Install project dependencies
+
+            # Update packages and install Node.js (Ubuntu-based)
+            sudo apt update -y
+            sudo apt install curl -y
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt install -y nodejs
+
+            # Install dependencies
             npm install
-            # Build the project
+
+            # Build Next.js project
             npm run build
-            # Clean up existing files in the web server directory
-            sudo rm -rf /var/www/html/*
-            # Move the build files to the web server directory
-            sudo mv build/* /var/www/html
-            # Set proper SELinux context for the web content
-            sudo chcon -R -t httpd_sys_content_t /var/www/html
-            # Restart Apache to apply changes
-            sudo systemctl restart httpd
+
+            # Install PM2 to keep app running
+            sudo npm install -g pm2
+
+            # Start or restart app using PM2
+            pm2 delete nextjs-app || true
+            pm2 start npm --name "nextjs-app" -- start
+            pm2 save
