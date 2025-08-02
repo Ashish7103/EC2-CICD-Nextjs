@@ -23,4 +23,8 @@ jobs:
           port: 22
           script:  |
            whoami
-            ls
+            cd EC2-CICD-Nextjs
+            git pull
+            npm install
+            npm run build
+            npm run start
