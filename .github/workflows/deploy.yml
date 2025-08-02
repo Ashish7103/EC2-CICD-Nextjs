@@ -21,10 +21,23 @@ jobs:
           username: ubuntu
           key: ${{ secrets.PRIVATE_SSH_KEY }}
           port: 22
-          script:  |
-           whoami
-            cd EC2-CICD-Nextjs
+          script: |
+            whoami
+            cd EC2-CICD-Nextjs || git clone https://github.com/Ashish7103/EC2-CICD-Nextjs.git && cd EC2-CICD-Nextjs
             git pull origin main
-            npm install
+
+            # Ensure npm is installed if missing
+            if ! command -v npm &> /dev/null; then
+            echo "npm not found, installing..."
+            sudo apt update
+            sudo apt install -y npm
+            fi
+
+            # Confirm installation
+            node -v
+            npm -v
+
+            # Install dependencies and build
+             npm install
             npm run build
-            npm run start
+            npm start
