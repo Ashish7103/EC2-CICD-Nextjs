@@ -1,4 +1,4 @@
-name: Deploy Next.js to EC2
+name: Deploy  to EC2
 
 on:
   push:
@@ -14,46 +14,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Deploy project files to EC2
-        uses: easingthemes/ssh-deploy@v2.1.5
+      - name: Execute remote SSH commands using password
+        uses: appleboy/ssh-action@v1
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.HOST_DNS }}
-          REMOTE_USER: ${{ secrets.USERNAME }}
-          SOURCE: "./"
-          TARGET: ${{ secrets.TARGET_DIR }}
-
-      - name: Run build & start commands on EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_DNS }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            # Navigate to project
-            cd ${{ secrets.TARGET_DIR }}
-
-            # Kill existing server on port 3000
-            sudo fuser -k 3000/tcp || true
-
-            # Ensure Node.js is installed (skip if already exists)
-            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-            sudo apt-get install -y nodejs
-
-            # Install dependencies
-            npm install
-
-            # Build the Next.js app
-            npm run build
-
-            # Install PM2 globally if not already
-            sudo npm install -g pm2
-
-            # Stop previous app if running
-            pm2 delete nextjs-app || true
-
-            # Start the app with PM2
-            pm2 start npm --name "nextjs-app" -- start
-
-            # Save PM2 process list (auto restart on reboot)
-            pm2 save
+          host: 13.233.22.44
+          username: ubuntu
+          key: ${{ secrets.PRIVATE_SSH_KEY }}
+          port: 22
+          script: whoami
