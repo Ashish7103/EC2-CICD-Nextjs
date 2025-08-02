@@ -24,7 +24,7 @@ jobs:
           script:  |
            whoami
             cd EC2-CICD-Nextjs
-            git pull
+            git pull origin main
             npm install
             npm run build
             npm run start
