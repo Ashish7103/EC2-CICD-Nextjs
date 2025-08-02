@@ -22,6 +22,9 @@ jobs:
           key: ${{ secrets.PRIVATE_SSH_KEY }}
           port: 22
           script: |
-            ../deploy.sh
-            
+            cd my-next-app
+            git pull origin main
+            npm install
+            npm run build       
+            npm run start
             
