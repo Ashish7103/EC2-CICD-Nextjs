@@ -1,4 +1,4 @@
-name: Deploy  to EC2
+name: Deploy to EC2
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Execute remote SSH commands using password
+      - name: SSH into EC2 and deploy app
         uses: appleboy/ssh-action@v1
         with:
           host: 13.233.22.44
@@ -23,21 +23,28 @@ jobs:
           port: 22
           script: |
             whoami
-            cd EC2-CICD-Nextjs || git clone https://github.com/Ashish7103/EC2-CICD-Nextjs.git && cd EC2-CICD-Nextjs
+
+            # Clone repo if directory doesn't exist
+            if [ ! -d "EC2-CICD-Nextjs" ]; then
+              git clone https://github.com/Ashish7103/EC2-CICD-Nextjs.git
+            fi
+
+            cd EC2-CICD-Nextjs
             git pull origin main
 
             # Ensure npm is installed if missing
             if ! command -v npm &> /dev/null; then
-            echo "npm not found, installing..."
-            sudo apt update
-            sudo apt install -y npm
+              echo "npm not found, installing..."
+              sudo apt update
+              sudo apt install -y npm
             fi
 
-            # Confirm installation
+            # Print versions
             node -v
             npm -v
 
-            # Install dependencies and build
-             npm install
+            # Install and build
+            npm install
             npm run build
-            npm start
+            npm run start
+            
