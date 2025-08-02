@@ -16,7 +16,7 @@ jobs:
 
       - name: Deploy project files to EC2
         uses: easingthemes/ssh-deploy@v2.1.5
-        env:
+        with:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
           REMOTE_USER: ${{ secrets.USERNAME }}
@@ -30,25 +30,17 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Navigate to project
             cd ${{ secrets.TARGET_DIR }}
 
-            # Update packages and install Node.js (Ubuntu-based)
             sudo apt update -y
             sudo apt install curl -y
             curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
             sudo apt install -y nodejs
 
-            # Install dependencies
             npm install
-
-            # Build Next.js project
             npm run build
 
-            # Install PM2 to keep app running
             sudo npm install -g pm2
-
-            # Start or restart app using PM2
             pm2 delete nextjs-app || true
             pm2 start npm --name "nextjs-app" -- start
             pm2 save
