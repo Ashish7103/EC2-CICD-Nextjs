@@ -22,7 +22,7 @@ jobs:
           key: ${{ secrets.PRIVATE_SSH_KEY }}
           port: 22
           script: |
-            cd my-next-app
+            cd EC2-CICD-Nextjs
             git pull origin main
             npm install
             npm run build       
