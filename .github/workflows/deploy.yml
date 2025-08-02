@@ -30,17 +30,30 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Navigate to project
             cd ${{ secrets.TARGET_DIR }}
 
-            sudo apt update -y
-            sudo apt install curl -y
-            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-            sudo apt install -y nodejs
+            # Kill existing server on port 3000
+            sudo fuser -k 3000/tcp || true
 
+            # Ensure Node.js is installed (skip if already exists)
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+
+            # Install dependencies
             npm install
+
+            # Build the Next.js app
             npm run build
 
+            # Install PM2 globally if not already
             sudo npm install -g pm2
+
+            # Stop previous app if running
             pm2 delete nextjs-app || true
+
+            # Start the app with PM2
             pm2 start npm --name "nextjs-app" -- start
+
+            # Save PM2 process list (auto restart on reboot)
             pm2 save
