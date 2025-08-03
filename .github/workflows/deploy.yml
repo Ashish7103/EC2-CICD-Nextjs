@@ -30,8 +30,21 @@ jobs:
             npm run build
             # npm run start
             npm install -g pm2
-           
-            pm2 delete nextjs || true
-            pm2 start npm --name "nextjs" -- run start
 
-         
+                # Kill process on port 3000 if it's already in use
+            PORT=3000
+                PID=$(sudo lsof -ti :$PORT)
+                if [ -n "$PID" ]; then
+                  echo "Killing process on port $PORT (PID: $PID)..."
+                  sudo kill -9 $PID
+                fi
+
+                # Ensure any existing PM2 process named 'nextjs' is deleted
+                pm2 delete nextjs || true
+
+                # Start the app using PM2
+                pm2 start npm --name "nextjs" -- run start
+
+                # Save PM2 process list so it can resurrect on reboot (optional)
+                pm2 save
+
