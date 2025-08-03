@@ -33,30 +33,38 @@ SSH into your EC2 instance:
 
 ```bash
 ssh -i "your-key.pem" ubuntu@your-ec2-ip
+```
 🔧 Install Node.js using NVM (Recommended)
 We will follow the DigitalOcean Option 3 method (Full Guide):
 
 Step 1: Install NVM
+```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 source ~/.bashrc
+```
 Step 2: Install Latest Node.js
-
+```bash
 nvm install node
+```
 ✅ This will install the latest LTS version of Node.js and set it as default.
 
 ⚙️ Install PM2
 PM2 is used to keep your Next.js app running after logout or reboot.
-
+```bash
 npm install -g pm2
 pm2 startup ubuntu
-
+```
 📂 Clone Your Repository
+```bash
 git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git EC2-CICD-Nextjs
 cd EC2-CICD-Nextjs
-npm install
 
+npm install
+```
 🔐 GitHub Secret Setup
+```sql
 GitHub → Settings → Secrets and variables → Actions → New repository secret
+```
 Add:
 
 PRIVATE_SSH_KEY: Paste your private EC2 .pem key (no passphrase)(private key you created locally)
@@ -65,7 +73,7 @@ Add: yoor public key in EC2 .ssh/Authorized_key this location
 
 ⚙️ GitHub Actions CI/CD Workflow
 Create .github/workflows/deploy.yml in your repo:
-
+```yaml
 name: Deploy to EC2
 
 on:
@@ -112,25 +120,25 @@ jobs:
             pm2 start npm --name "nextjs" -- run start
             pm2 save
 
-
+```
 🌀 Why PM2?
 PM2 is a production-grade process manager for Node.js apps.
 
 ✅ Auto-restarts app on failure
 ✅ Keeps app running after SSH session closes
 ✅ Saves process list for reboot recovery
-
+```bash
 pm2 start npm --name "nextjs" -- run start
 pm2 save
-
+```
 📚 References
-🧾 DigitalOcean - Install Node.js on Ubuntu (Option 3)
+## 📚 References
 
-🧾 Deploy Next.js to EC2 via GitHub Actions
+- 🧾 [DigitalOcean – Install Node.js on Ubuntu (Option 3)](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04#option-3-install-node-using-the-node-version-manager)
+- 🧾 [Deploy Next.js to EC2 via GitHub Actions](https://www.interviewsolutionshub.com/blog/how-to-deploy-a-nextjs-application-on-aws-ec2-using-github-actions)
+- 🧾 [PM2 Documentation](https://pm2.keymetrics.io/)
+- 🧾 [Appleboy SSH GitHub Action](https://github.com/appleboy/ssh-action)
 
-🧾 PM2 Documentation
-
-🧾 Appleboy SSH GitHub Action
 
 👨‍💻 Author & Contributions
 This CI/CD guide was built to help developers deploy scalable and automated Next.js apps to AWS. Contributions are welcome!
