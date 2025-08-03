@@ -32,6 +32,6 @@ jobs:
             npm install -g pm2
 
             pm2 delete nextjs || true
-            pm2 start npm --name "nextjs" -- run start
+            # pm2 start npm --name "nextjs" -- run start
 
          
