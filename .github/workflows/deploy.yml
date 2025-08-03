@@ -28,6 +28,6 @@ jobs:
             nvm use 18 || . ~/.nvm/nvm.sh && nvm install 18 && nvm use 18
             npm install
             npm run build
-            npm run start
+            # npm run start
 
          
